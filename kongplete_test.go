@@ -48,121 +48,76 @@ func TestComplete(t *testing.T) {
 
 	tests := []completeTest{
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"foo", "bar"},
-			want:            true,
-			line:            "myApp ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"foo", "bar"},
+			line:   "myApp ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"foo"},
-			want:            true,
-			line:            "myApp foo",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"foo"},
+			line:   "myApp foo",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"rabbit", "duck"},
-			want:            true,
-			line:            "myApp foo ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"rabbit", "duck"},
+			line:   "myApp foo ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"rabbit"},
-			want:            true,
-			line:            "myApp foo r",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"rabbit"},
+			line:   "myApp foo r",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"--bar", "--baz", "--lion"},
-			want:            true,
-			line:            "myApp foo -",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"--bar", "--baz", "--lion"},
+			line:   "myApp foo -",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{},
-			want:            true,
-			line:            "myApp foo --lion ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{},
+			line:   "myApp foo --lion ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"rabbit", "duck"},
-			want:            true,
-			line:            "myApp foo --baz ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"rabbit", "duck"},
+			line:   "myApp foo --baz ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"--bar", "--baz", "--lion"},
-			want:            true,
-			line:            "myApp foo --baz -",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"--bar", "--baz", "--lion"},
+			line:   "myApp foo --baz -",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"thing1", "thing2"},
-			want:            true,
-			line:            "myApp foo --bar ",
-			point:           -1,
+			parser: kong.Must(&cli),
+
+			want: []string{"thing1", "thing2"},
+			line: "myApp foo --bar ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"thing1", "thing2", "otherthing1", "otherthing2"},
-			want:            true,
-			line:            "myApp bar ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"thing1", "thing2", "otherthing1", "otherthing2"},
+			line:   "myApp bar ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"oh", "my", "gizzles"},
-			want:            true,
-			line:            "myApp bar --omg ",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"oh", "my", "gizzles"},
+			line:   "myApp bar --omg ",
 		},
 		{
-			parser:          kong.Must(&cli),
-			appName:         "myApp",
-			wantCompletions: []string{"-n", "--number", "--omg"},
-			want:            true,
-			line:            "myApp bar -",
-			point:           -1,
+			parser: kong.Must(&cli),
+			want:   []string{"-n", "--number", "--omg"},
+			line:   "myApp bar -",
 		},
 	}
-
 	for _, td := range tests {
 		name := td.name
 		if name == "" {
 			name = td.line
 		}
 		t.Run(name, func(t *testing.T) {
-			options := td.options
-			if options == nil {
-				options = []Option{WithPredictors(predictors)}
-			}
-			completions, got, err := runComplete(t, td.appName, td.parser, td.line, td.point, options)
-			if td.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-			assert.Equal(t, td.want, got)
-			assert.ElementsMatch(t, td.wantCompletions, completions)
+			options := []Option{WithPredictors(predictors)}
+			got := runComplete(t, td.parser, td.line, options)
+			assert.ElementsMatch(t, td.want, got)
 		})
 	}
 }
@@ -206,26 +161,18 @@ func (t testTag) Get(k string) string {
 }
 
 type completeTest struct {
-	name            string
-	parser          *kong.Kong
-	appName         string
-	options         []Option
-	wantCompletions []string
-	want            bool
-	wantErr         bool
-	line            string
-	point           int
+	name   string
+	parser *kong.Kong
+	want   []string
+	line   string
 }
 
-func setLineAndPoint(t *testing.T, line string, point int) func() {
+func setLineAndPoint(t *testing.T, line string) func() {
 	t.Helper()
-	if point == -1 {
-		point = len(line)
-	}
 	origLine, hasOrigLine := os.LookupEnv(envLine)
 	origPoint, hasOrigPoint := os.LookupEnv(envPoint)
 	require.NoError(t, os.Setenv(envLine, line))
-	require.NoError(t, os.Setenv(envPoint, strconv.Itoa(point)))
+	require.NoError(t, os.Setenv(envPoint, strconv.Itoa(len(line))))
 	return func() {
 		t.Helper()
 		require.NoError(t, os.Unsetenv(envLine))
@@ -239,16 +186,26 @@ func setLineAndPoint(t *testing.T, line string, point int) func() {
 	}
 }
 
-func runComplete(t *testing.T, appName string, parser *kong.Kong, line string, point int, opts []Option) ([]string, bool, error) {
+func runComplete(t *testing.T, parser *kong.Kong, line string, options []Option) []string {
 	t.Helper()
-	cleanup := setLineAndPoint(t, line, point)
+	options = append(options,
+		WithErrorHandler(func(err error) {
+			t.Helper()
+			assert.NoError(t, err)
+		}),
+		WithExitFunc(func(code int) {
+			t.Helper()
+			assert.Equal(t, 0, code)
+		}),
+	)
+	cleanup := setLineAndPoint(t, line)
 	defer cleanup()
 	var buf bytes.Buffer
 	if parser != nil {
 		parser.Stdout = &buf
 	}
-	got, err := Complete(appName, parser, opts...)
-	return parseOutput(buf.String()), got, err
+	Complete(parser, options...)
+	return parseOutput(buf.String())
 }
 
 func parseOutput(output string) []string {

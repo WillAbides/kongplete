@@ -5,16 +5,21 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/posener/complete"
+	"github.com/posener/complete/cmd/install"
 )
 
 const predictorTag = "predictor"
 
 type options struct {
-	predictors map[string]complete.Predictor
+	predictors   map[string]complete.Predictor
+	exitFunc     func(code int)
+	errorHandler func(error)
 }
 
+//Option is a configuration option for running Complete
 type Option func(*options)
 
+//WithPredictor use the named predictor
 func WithPredictor(name string, predictor complete.Predictor) Option {
 	return func(o *options) {
 		if o.predictors == nil {
@@ -24,6 +29,7 @@ func WithPredictor(name string, predictor complete.Predictor) Option {
 	}
 }
 
+//WithPredictors use these predictors
 func WithPredictors(predictors map[string]complete.Predictor) Option {
 	return func(o *options) {
 		for k, v := range predictors {
@@ -32,12 +38,33 @@ func WithPredictors(predictors map[string]complete.Predictor) Option {
 	}
 }
 
-//Command returns a completion Command for a kong parser
-func Command(parser *kong.Kong, opt ...Option) (complete.Command, error) {
-	opts := &options{}
+//WithExitFunc the exit command that is run after completions
+func WithExitFunc(exitFunc func(code int)) Option {
+	return func(o *options) {
+		o.exitFunc = exitFunc
+	}
+}
+
+//WithErrorHandler handle errors with completions
+func WithErrorHandler(handler func(error)) Option {
+	return func(o *options) {
+		o.errorHandler = handler
+	}
+}
+
+func buildOptions(opt ...Option) *options {
+	opts := &options{
+		predictors: map[string]complete.Predictor{},
+	}
 	for _, o := range opt {
 		o(opts)
 	}
+	return opts
+}
+
+//Command returns a completion Command for a kong parser
+func Command(parser *kong.Kong, opt ...Option) (complete.Command, error) {
+	opts := buildOptions(opt...)
 	if parser == nil || parser.Model == nil {
 		return complete.Command{}, nil
 	}
@@ -48,18 +75,33 @@ func Command(parser *kong.Kong, opt ...Option) (complete.Command, error) {
 	return *command, err
 }
 
-//Complete runs completion for a kong parser and returns true if completions ran (you usually want to exit when it returns true)
-func Complete(appName string, parser *kong.Kong, opt ...Option) (bool, error) {
+//Complete runs completion for a kong parser
+func Complete(parser *kong.Kong, opt ...Option) {
 	if parser == nil {
-		return false, nil
+		return
+	}
+	opts := buildOptions(opt...)
+	errHandler := opts.errorHandler
+	if errHandler == nil {
+		errHandler = func(err error) {
+			parser.Errorf("error running command completion: %v", err)
+		}
+	}
+	exitFunc := opts.exitFunc
+	if exitFunc == nil {
+		exitFunc = parser.Exit
 	}
 	cmd, err := Command(parser, opt...)
 	if err != nil {
-		return false, err
+		errHandler(err)
+		exitFunc(1)
 	}
-	cmp := complete.New(appName, cmd)
+	cmp := complete.New(parser.Model.Name, cmd)
 	cmp.Out = parser.Stdout
-	return cmp.Complete(), nil
+	done := cmp.Complete()
+	if done {
+		exitFunc(0)
+	}
 }
 
 func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*complete.Command, error) {
@@ -177,4 +219,27 @@ func argsPredictor(args []*kong.Positional, predictors map[string]complete.Predi
 
 func flagPredictor(flag *kong.Flag, predictors map[string]complete.Predictor) (complete.Predictor, error) {
 	return valuePredictor(flag.Value, predictors)
+}
+
+//InstallShellCompletions is a helper to install completions for a kong context
+func InstallShellCompletions(k *kong.Context) error {
+	return install.Install(k.Model.Name)
+}
+
+//UninstallShellCompletions is a helper to uninstall completions for a kong context
+func UninstallShellCompletions(k *kong.Context) error {
+	return install.Uninstall(k.Model.Name)
+}
+
+//InstallCompletions is a kong command for installing or uninstalling shell completions
+type InstallCompletions struct {
+	Uninstall bool
+}
+
+//Run runs InstallCompletions
+func (c *InstallCompletions) Run(k *kong.Context) error {
+	if c.Uninstall {
+		return UninstallShellCompletions(k)
+	}
+	return InstallShellCompletions(k)
 }
