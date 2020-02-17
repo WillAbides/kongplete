@@ -10,8 +10,6 @@ import (
 )
 
 var cli struct {
-	Debug bool `help:"Debug mode."`
-
 	Rm struct {
 		User      string `help:"Run as user." short:"u" default:"default"`
 		Force     bool   `help:"Force removal." short:"f"`
@@ -23,6 +21,8 @@ var cli struct {
 	Ls struct {
 		Paths []string `arg:"" optional:"" help:"Paths to list." type:"path" predictor:"file"`
 	} `cmd:"" help:"List paths."`
+
+	Debug bool `help:"Debug mode."`
 
 	InstallCompletions kongplete.InstallCompletions `cmd:"" help:"install shell completions"`
 }
