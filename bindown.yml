@@ -1,0 +1,25 @@
+downloaders:
+  gobin:
+    - os: darwin
+      arch: amd64
+      url: https://github.com/myitcv/gobin/releases/download/v0.0.10/darwin-amd64
+      checksum: 84ed966949e06bebd7d006bc343caf9d736932fd8b37df5cb5b268a28d07bd30
+      archive_path: darwin-amd64
+    - os: linux
+      arch: amd64
+      url: https://github.com/myitcv/gobin/releases/download/v0.0.10/linux-amd64
+      checksum: 415266d9af98578067051653f5057ea267c51ebf085408df48b118a8b978bac6
+      archive_path: linux-amd64
+  golangci-lint:
+    - os: darwin
+      arch: amd64
+      url: https://github.com/golangci/golangci-lint/releases/download/v1.21.0/golangci-lint-1.21.0-darwin-amd64.tar.gz
+      checksum: 2b2713ec5007e67883aa501eebb81f22abfab0cf0909134ba90f60a066db3760
+      archive_path: golangci-lint-1.21.0-darwin-amd64/golangci-lint
+      link: true
+    - os: linux
+      arch: amd64
+      url: https://github.com/golangci/golangci-lint/releases/download/v1.21.0/golangci-lint-1.21.0-linux-amd64.tar.gz
+      checksum: 2c861f8dc56b560474aa27cab0c075991628cc01af3451e27ac82f5d10d5106b
+      archive_path: golangci-lint-1.21.0-linux-amd64/golangci-lint
+      link: true

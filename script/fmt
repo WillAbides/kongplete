@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+CDPATH="" cd -- "$(dirname -- "$(dirname -- "$0")")"
+
+make -s bin/golangci-lint
+
+bin/golangci-lint run --disable-all --no-config -E goimports --fix
