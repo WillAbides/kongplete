@@ -1,4 +1,6 @@
-package main
+// This example is adapted from the shell example in github.com/alecthomas/kong
+
+package kongplete_test
 
 import (
 	"fmt"
@@ -9,7 +11,7 @@ import (
 	"github.com/willabides/kongplete"
 )
 
-var cli struct {
+var shellCli struct {
 	Rm struct {
 		User      string `help:"Run as user." short:"u" default:"default"`
 		Force     bool   `help:"Force removal." short:"f"`
@@ -27,23 +29,26 @@ var cli struct {
 	InstallCompletions kongplete.InstallCompletions `cmd:"" help:"install shell completions"`
 }
 
-func main() {
-	parser := kong.Must(&cli,
+func Example() {
+	// Create a kong parser as usual, but don't run Parse quite yet.
+	parser := kong.Must(&shellCli,
 		kong.Name("shell"),
 		kong.Description("A shell-like example app."),
 		kong.UsageOnError(),
-		kong.ConfigureHelp(kong.HelpOptions{
-			Compact: true,
-			Summary: true,
-		}))
+	)
+
+	// Run kongplete.Complete to handle completion requests
 	kongplete.Complete(parser,
 		kongplete.WithPredictor("file", complete.PredictFiles("*")),
 	)
+
+	// Proceed as normal after kongplete.Complete.
 	ctx, err := parser.Parse(os.Args[1:])
 	parser.FatalIfErrorf(err)
+
 	switch ctx.Command() {
 	case "rm <path>":
-		fmt.Println(cli.Rm.Paths, cli.Rm.Force, cli.Rm.Recursive)
+		fmt.Println(shellCli.Rm.Paths, shellCli.Rm.Force, shellCli.Rm.Recursive)
 
 	case "ls":
 	}

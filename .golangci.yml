@@ -8,6 +8,9 @@ issues:
         - dupl
         - gosec
         - goconst
+    - text: package comment should be of the form
+      linters:
+        - golint
 linters:
   enable:
     - golint
