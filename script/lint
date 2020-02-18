@@ -8,5 +8,3 @@ make -s bin/golangci-lint
 script/readme --check
 go mod verify
 bin/golangci-lint run
-cd _examples
-../bin/golangci-lint run --config ../.golangci.yml ./...
