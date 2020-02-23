@@ -39,10 +39,11 @@ func TestComplete(t *testing.T) {
 			} `kong:"cmd"`
 		} `kong:"cmd"`
 		Bar struct {
-			Tiger  string `kong:"arg,predictor=things"`
-			Bear   string `kong:"arg,predictor=otherthings"`
-			OMG    string `kong:"enum='oh,my,gizzles'"`
-			Number int    `kong:"short=n,enum='1,2,3'"`
+			Tiger   string `kong:"arg,predictor=things"`
+			Bear    string `kong:"arg,predictor=otherthings"`
+			OMG     string `kong:"enum='oh,my,gizzles'"`
+			Number  int    `kong:"short=n,enum='1,2,3'"`
+			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
 	}
 
@@ -95,8 +96,18 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"thing1", "thing2", "otherthing1", "otherthing2"},
+			want:   []string{"thing1", "thing2"},
 			line:   "myApp bar ",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"thing1", "thing2"},
+			line:   "myApp bar thing",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"otherthing1", "otherthing2"},
+			line:   "myApp bar thing1 ",
 		},
 		{
 			parser: kong.Must(&cli),
@@ -105,8 +116,28 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"-n", "--number", "--omg", "--help"},
+			want:   []string{"-n", "--number", "--omg", "--help", "--boofl", "-b"},
 			line:   "myApp bar -",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"thing1", "thing2"},
+			line:   "myApp bar -b ",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"-n", "--number", "--omg", "--help", "--boofl", "-b"},
+			line:   "myApp bar -b thing1 -",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"oh", "my", "gizzles"},
+			line:   "myApp bar -b thing1 --omg ",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"otherthing1", "otherthing2"},
+			line:   "myApp bar -b thing1 --omg gizzles ",
 		},
 	}
 	for _, td := range tests {

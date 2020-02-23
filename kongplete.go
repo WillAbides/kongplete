@@ -6,6 +6,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/posener/complete"
 	"github.com/posener/complete/cmd/install"
+	"github.com/willabides/kongplete/internal/positionalpredictor"
 )
 
 const predictorTag = "predictor"
@@ -135,19 +136,52 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 		if err != nil {
 			return nil, err
 		}
-		cmd.GlobalFlags["--"+flag.Name] = predictor
-		if flag.Short != 0 {
-			cmd.GlobalFlags["-"+string(flag.Short)] = predictor
+		for _, f := range flagNamesWithHyphens(flag) {
+			cmd.GlobalFlags[f] = predictor
 		}
 	}
 
-	var err error
-	cmd.Args, err = argsPredictor(node.Positional, predictors)
+	boolFlags, nonBoolFlags := boolAndNonBoolFlags(node.Flags)
+	pps, err := positionalPredictors(node.Positional, predictors)
 	if err != nil {
 		return nil, err
 	}
+	cmd.Args = &positionalpredictor.PositionalPredictor{
+		Predictors: pps,
+		ArgFlags:   flagNamesWithHyphens(nonBoolFlags...),
+		BoolFlags:  flagNamesWithHyphens(boolFlags...),
+	}
 
 	return &cmd, nil
+}
+
+func flagNamesWithHyphens(flags ...*kong.Flag) []string {
+	names := make([]string, 0, len(flags)*2)
+	if flags == nil {
+		return names
+	}
+	for _, flag := range flags {
+		names = append(names, "--"+flag.Name)
+		if flag.Short != 0 {
+			names = append(names, "-"+string(flag.Short))
+		}
+	}
+	return names
+}
+
+//boolAndNonBoolFlags divides a list of flags into boolean and non-boolean flags
+func boolAndNonBoolFlags(flags []*kong.Flag) (boolFlags []*kong.Flag, nonBoolFlags []*kong.Flag) {
+	boolFlags = make([]*kong.Flag, 0, len(flags))
+	nonBoolFlags = make([]*kong.Flag, 0, len(flags))
+	for _, flag := range flags {
+		switch flag.Value.IsBool() {
+		case true:
+			boolFlags = append(boolFlags, flag)
+		case false:
+			nonBoolFlags = append(nonBoolFlags, flag)
+		}
+	}
+	return boolFlags, nonBoolFlags
 }
 
 //kongTag interface for *kong.kongTag
@@ -199,22 +233,16 @@ func valuePredictor(value *kong.Value, predictors map[string]complete.Predictor)
 	}
 }
 
-func argsPredictor(args []*kong.Positional, predictors map[string]complete.Predictor) (complete.Predictor, error) {
-	switch len(args) {
-	case 0:
-		return nil, nil
-	case 1:
-		return valuePredictor(args[0], predictors)
-	}
-	resPredictors := make([]complete.Predictor, 0, len(args))
-	for _, arg := range args {
-		resPredictor, err := valuePredictor(arg, predictors)
+func positionalPredictors(args []*kong.Positional, predictors map[string]complete.Predictor) ([]complete.Predictor, error) {
+	res := make([]complete.Predictor, len(args))
+	var err error
+	for i, arg := range args {
+		res[i], err = valuePredictor(arg, predictors)
 		if err != nil {
 			return nil, err
 		}
-		resPredictors = append(resPredictors, resPredictor)
 	}
-	return complete.PredictOr(resPredictors...), nil
+	return res, nil
 }
 
 func flagPredictor(flag *kong.Flag, predictors map[string]complete.Predictor) (complete.Predictor, error) {
