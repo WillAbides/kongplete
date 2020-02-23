@@ -110,8 +110,8 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 	}
 
 	cmd := complete.Command{
-		Sub:   complete.Commands{},
-		Flags: complete.Flags{},
+		Sub:         complete.Commands{},
+		GlobalFlags: complete.Flags{},
 	}
 
 	for _, child := range node.Children {
@@ -135,9 +135,9 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 		if err != nil {
 			return nil, err
 		}
-		cmd.Flags["--"+flag.Name] = predictor
+		cmd.GlobalFlags["--"+flag.Name] = predictor
 		if flag.Short != 0 {
-			cmd.Flags["-"+string(flag.Short)] = predictor
+			cmd.GlobalFlags["-"+string(flag.Short)] = predictor
 		}
 	}
 
