@@ -69,7 +69,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"--bar", "--baz", "--lion"},
+			want:   []string{"--bar", "--baz", "--lion", "--help"},
 			line:   "myApp foo -",
 		},
 		{
@@ -84,7 +84,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"--bar", "--baz", "--lion"},
+			want:   []string{"--bar", "--baz", "--lion", "--help"},
 			line:   "myApp foo --baz -",
 		},
 		{
@@ -105,7 +105,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"-n", "--number", "--omg"},
+			want:   []string{"-n", "--number", "--omg", "--help"},
 			line:   "myApp bar -",
 		},
 	}
