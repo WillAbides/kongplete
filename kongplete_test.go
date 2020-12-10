@@ -33,6 +33,7 @@ func TestComplete(t *testing.T) {
 			Embedded embed  `kong:"embed"`
 			Bar      string `kong:"predictor=things"`
 			Baz      bool
+			Qux      bool `kong:"hidden"`
 			Rabbit   struct {
 			} `kong:"cmd"`
 			Duck struct {

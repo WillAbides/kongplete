@@ -129,7 +129,7 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 	}
 
 	for _, flag := range node.Flags {
-		if flag == nil {
+		if flag == nil || flag.Hidden {
 			continue
 		}
 		predictor, err := flagPredictor(flag, predictors)
