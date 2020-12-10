@@ -116,7 +116,7 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 	}
 
 	for _, child := range node.Children {
-		if child == nil {
+		if child == nil || child.Hidden {
 			continue
 		}
 		childCmd, err := nodeCommand(child, predictors)
