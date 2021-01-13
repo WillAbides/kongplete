@@ -8,6 +8,7 @@ issues:
         - dupl
         - gosec
         - goconst
+        - maligned
     - text: package comment should be of the form
       linters:
         - golint

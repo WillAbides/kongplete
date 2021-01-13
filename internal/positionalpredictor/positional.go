@@ -6,14 +6,14 @@ import (
 	"github.com/posener/complete"
 )
 
-//PositionalPredictor is a predictor for positional arguments
+// PositionalPredictor is a predictor for positional arguments
 type PositionalPredictor struct {
 	Predictors []complete.Predictor
 	ArgFlags   []string
 	BoolFlags  []string
 }
 
-//Predict implements complete.Predict
+// Predict implements complete.Predict
 func (p *PositionalPredictor) Predict(a complete.Args) []string {
 	predictor := p.predictor(a)
 	if predictor == nil {
@@ -31,7 +31,7 @@ func (p *PositionalPredictor) predictor(a complete.Args) complete.Predictor {
 	return p.Predictors[position]
 }
 
-//predictorIndex returns the index in predictors to use. Returns -1 if no predictor should be used.
+// predictorIndex returns the index in predictors to use. Returns -1 if no predictor should be used.
 func (p *PositionalPredictor) predictorIndex(a complete.Args) int {
 	idx := 0
 	for i := 0; i < len(a.Completed); i++ {
@@ -42,7 +42,7 @@ func (p *PositionalPredictor) predictorIndex(a complete.Args) int {
 	return idx
 }
 
-//nonPredictorPos returns true if the value at this position is either a flag or a flag's argument
+// nonPredictorPos returns true if the value at this position is either a flag or a flag's argument
 func (p *PositionalPredictor) nonPredictorPos(a complete.Args, pos int) bool {
 	if pos < 0 || pos > len(a.All)-1 {
 		return false
@@ -58,7 +58,7 @@ func (p *PositionalPredictor) nonPredictorPos(a complete.Args, pos int) bool {
 	return p.nextValueIsFlagArg(prev)
 }
 
-//valIsFlag returns true if the value matches a flag from the configuration
+// valIsFlag returns true if the value matches a flag from the configuration
 func (p *PositionalPredictor) valIsFlag(val string) bool {
 	val = strings.Split(val, "=")[0]
 	for _, flag := range p.BoolFlags {
@@ -74,7 +74,7 @@ func (p *PositionalPredictor) valIsFlag(val string) bool {
 	return false
 }
 
-//nextValueIsFlagArg returns true if the value matches an ArgFlag and doesn't contain an equal sign.
+// nextValueIsFlagArg returns true if the value matches an ArgFlag and doesn't contain an equal sign.
 func (p *PositionalPredictor) nextValueIsFlagArg(val string) bool {
 	if strings.Contains(val, "=") {
 		return false

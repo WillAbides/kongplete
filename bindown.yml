@@ -13,13 +13,13 @@ downloaders:
   golangci-lint:
     - os: darwin
       arch: amd64
-      url: https://github.com/golangci/golangci-lint/releases/download/v1.21.0/golangci-lint-1.21.0-darwin-amd64.tar.gz
-      checksum: 2b2713ec5007e67883aa501eebb81f22abfab0cf0909134ba90f60a066db3760
-      archive_path: golangci-lint-1.21.0-darwin-amd64/golangci-lint
+      url: https://github.com/golangci/golangci-lint/releases/download/v1.35.2/golangci-lint-1.35.2-darwin-amd64.tar.gz
+      checksum: 1f4666e6a303ba76f5c1ab0592390946668dc83607df96c6caba9c10d58e976f
+      archive_path: golangci-lint-1.35.2-darwin-amd64/golangci-lint
       link: true
     - os: linux
       arch: amd64
-      url: https://github.com/golangci/golangci-lint/releases/download/v1.21.0/golangci-lint-1.21.0-linux-amd64.tar.gz
-      checksum: 2c861f8dc56b560474aa27cab0c075991628cc01af3451e27ac82f5d10d5106b
-      archive_path: golangci-lint-1.21.0-linux-amd64/golangci-lint
+      url: https://github.com/golangci/golangci-lint/releases/download/v1.35.2/golangci-lint-1.35.2-linux-amd64.tar.gz
+      checksum: 8f9ede0ec40beca515b619e6aede57e59b86407e110882fbe3f947f1fa10032d
+      archive_path: golangci-lint-1.35.2-linux-amd64/golangci-lint
       link: true

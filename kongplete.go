@@ -17,10 +17,10 @@ type options struct {
 	errorHandler func(error)
 }
 
-//Option is a configuration option for running Complete
+// Option is a configuration option for running Complete
 type Option func(*options)
 
-//WithPredictor use the named predictor
+// WithPredictor use the named predictor
 func WithPredictor(name string, predictor complete.Predictor) Option {
 	return func(o *options) {
 		if o.predictors == nil {
@@ -30,7 +30,7 @@ func WithPredictor(name string, predictor complete.Predictor) Option {
 	}
 }
 
-//WithPredictors use these predictors
+// WithPredictors use these predictors
 func WithPredictors(predictors map[string]complete.Predictor) Option {
 	return func(o *options) {
 		for k, v := range predictors {
@@ -39,14 +39,14 @@ func WithPredictors(predictors map[string]complete.Predictor) Option {
 	}
 }
 
-//WithExitFunc the exit command that is run after completions
+// WithExitFunc the exit command that is run after completions
 func WithExitFunc(exitFunc func(code int)) Option {
 	return func(o *options) {
 		o.exitFunc = exitFunc
 	}
 }
 
-//WithErrorHandler handle errors with completions
+// WithErrorHandler handle errors with completions
 func WithErrorHandler(handler func(error)) Option {
 	return func(o *options) {
 		o.errorHandler = handler
@@ -63,7 +63,7 @@ func buildOptions(opt ...Option) *options {
 	return opts
 }
 
-//Command returns a completion Command for a kong parser
+// Command returns a completion Command for a kong parser
 func Command(parser *kong.Kong, opt ...Option) (complete.Command, error) {
 	opts := buildOptions(opt...)
 	if parser == nil || parser.Model == nil {
@@ -76,7 +76,7 @@ func Command(parser *kong.Kong, opt ...Option) (complete.Command, error) {
 	return *command, err
 }
 
-//Complete runs completion for a kong parser
+// Complete runs completion for a kong parser
 func Complete(parser *kong.Kong, opt ...Option) {
 	if parser == nil {
 		return
@@ -169,8 +169,8 @@ func flagNamesWithHyphens(flags ...*kong.Flag) []string {
 	return names
 }
 
-//boolAndNonBoolFlags divides a list of flags into boolean and non-boolean flags
-func boolAndNonBoolFlags(flags []*kong.Flag) (boolFlags []*kong.Flag, nonBoolFlags []*kong.Flag) {
+// boolAndNonBoolFlags divides a list of flags into boolean and non-boolean flags
+func boolAndNonBoolFlags(flags []*kong.Flag) (boolFlags, nonBoolFlags []*kong.Flag) {
 	boolFlags = make([]*kong.Flag, 0, len(flags))
 	nonBoolFlags = make([]*kong.Flag, 0, len(flags))
 	for _, flag := range flags {
@@ -184,7 +184,7 @@ func boolAndNonBoolFlags(flags []*kong.Flag) (boolFlags []*kong.Flag, nonBoolFla
 	return boolFlags, nonBoolFlags
 }
 
-//kongTag interface for *kong.kongTag
+// kongTag interface for *kong.kongTag
 type kongTag interface {
 	Has(string) bool
 	Get(string) string
@@ -249,22 +249,22 @@ func flagPredictor(flag *kong.Flag, predictors map[string]complete.Predictor) (c
 	return valuePredictor(flag.Value, predictors)
 }
 
-//InstallShellCompletions is a helper to install completions for a kong context
+// InstallShellCompletions is a helper to install completions for a kong context
 func InstallShellCompletions(k *kong.Context) error {
 	return install.Install(k.Model.Name)
 }
 
-//UninstallShellCompletions is a helper to uninstall completions for a kong context
+// UninstallShellCompletions is a helper to uninstall completions for a kong context
 func UninstallShellCompletions(k *kong.Context) error {
 	return install.Uninstall(k.Model.Name)
 }
 
-//InstallCompletions is a kong command for installing or uninstalling shell completions
+// InstallCompletions is a kong command for installing or uninstalling shell completions
 type InstallCompletions struct {
 	Uninstall bool
 }
 
-//Run runs InstallCompletions
+// Run runs InstallCompletions
 func (c *InstallCompletions) Run(k *kong.Context) error {
 	if c.Uninstall {
 		return UninstallShellCompletions(k)
