@@ -16,6 +16,7 @@ var shellCli struct {
 		User      string `help:"Run as user." short:"u" default:"default"`
 		Force     bool   `help:"Force removal." short:"f"`
 		Recursive bool   `help:"Recursively remove files." short:"r"`
+		Hidden    string `help:"A hidden flag" hidden:""`
 
 		Paths []string `arg:"" help:"Paths to remove." type:"path" name:"path" predictor:"file"`
 	} `cmd:"" help:"Remove files."`
@@ -23,6 +24,8 @@ var shellCli struct {
 	Ls struct {
 		Paths []string `arg:"" optional:"" help:"Paths to list." type:"path" predictor:"file"`
 	} `cmd:"" help:"List paths."`
+
+	Hidden struct {} `cmd:"" help:"A hidden command" hidden:""`
 
 	Debug bool `help:"Debug mode."`
 
@@ -50,6 +53,6 @@ func Example() {
 	case "rm <path>":
 		fmt.Println(shellCli.Rm.Paths, shellCli.Rm.Force, shellCli.Rm.Recursive)
 
-	case "ls":
+	case "ls", "hidden":
 	}
 }
