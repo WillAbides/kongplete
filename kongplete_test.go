@@ -33,6 +33,7 @@ func TestComplete(t *testing.T) {
 			Embedded embed  `kong:"embed"`
 			Bar      string `kong:"predictor=things"`
 			Baz      bool
+			Qux      bool `kong:"hidden"`
 			Rabbit   struct {
 			} `kong:"cmd"`
 			Duck struct {
@@ -45,6 +46,7 @@ func TestComplete(t *testing.T) {
 			Number  int    `kong:"short=n,enum='1,2,3'"`
 			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
+		Baz struct{} `kong:"cmd,hidden"`
 	}
 
 	tests := []completeTest{
