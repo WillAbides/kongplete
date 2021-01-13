@@ -25,7 +25,7 @@ var shellCli struct {
 		Paths []string `arg:"" optional:"" help:"Paths to list." type:"path" predictor:"file"`
 	} `cmd:"" help:"List paths."`
 
-	Hidden struct {} `cmd:"" help:"A hidden command" hidden:""`
+	Hidden struct{} `cmd:"" help:"A hidden command" hidden:""`
 
 	Debug bool `help:"Debug mode."`
 
