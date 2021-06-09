@@ -56,3 +56,5 @@ func Example() {
 	case "ls", "hidden":
 	}
 }
+
+// If you are using kong Mappers, implement kongplete.PredictorProvider automatically predict mapped fields
