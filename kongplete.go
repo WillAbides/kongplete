@@ -11,6 +11,10 @@ import (
 
 const predictorTag = "predictor"
 
+type PredictorProvider interface {
+	Predictor(flag *kong.Flag) complete.Predictor
+}
+
 type options struct {
 	predictors   map[string]complete.Predictor
 	exitFunc     func(code int)
@@ -246,6 +250,10 @@ func positionalPredictors(args []*kong.Positional, predictors map[string]complet
 }
 
 func flagPredictor(flag *kong.Flag, predictors map[string]complete.Predictor) (complete.Predictor, error) {
+	predictorHelper, ok := flag.Value.Mapper.(PredictorProvider)
+	if ok {
+		return predictorHelper.Predictor(flag), nil
+	}
 	return valuePredictor(flag.Value, predictors)
 }
 
