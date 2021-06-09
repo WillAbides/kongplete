@@ -57,4 +57,4 @@ func Example() {
 	}
 }
 
-// If you are using kong Mappers, implement kongplete.PredictorProvider automatically predict mapped fields
+// If you are using kong Mappers, implement kongplete.PredictorProvider to automatically predict mapped fields
