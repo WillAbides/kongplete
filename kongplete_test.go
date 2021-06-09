@@ -3,6 +3,7 @@ package kongplete
 import (
 	"bytes"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -17,6 +18,19 @@ const (
 	envLine  = "COMP_LINE"
 	envPoint = "COMP_POINT"
 )
+
+type Mapper struct {
+}
+
+func (_ *Mapper) Decode(ctx *kong.DecodeContext, target reflect.Value) error {
+	return nil
+}
+
+func (_ *Mapper) Predictor(flag *kong.Flag) complete.Predictor {
+	return complete.PredictSet("mapper")
+}
+
+type MapperType string
 
 func TestComplete(t *testing.T) {
 	type embed struct {
@@ -46,13 +60,16 @@ func TestComplete(t *testing.T) {
 			Number  int    `kong:"short=n,enum='1,2,3'"`
 			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
+		Mappy struct {
+			Mapped MapperType
+		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`
 	}
 
 	tests := []completeTest{
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"foo", "bar"},
+			want:   []string{"foo", "bar", "mappy"},
 			line:   "myApp ",
 		},
 		{
@@ -140,6 +157,11 @@ func TestComplete(t *testing.T) {
 			parser: kong.Must(&cli),
 			want:   []string{"otherthing1", "otherthing2"},
 			line:   "myApp bar -b thing1 --omg gizzles ",
+		},
+		{
+			parser: kong.Must(&cli, kong.TypeMapper(reflect.TypeOf((*MapperType)(nil)).Elem(), &Mapper{})),
+			want:   []string{"mapper"},
+			line:   "myApp mappy --mapped m",
 		},
 	}
 	for _, td := range tests {
