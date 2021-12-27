@@ -4,6 +4,8 @@ set -e
 
 CDPATH="" cd -- "$(dirname -- "$(dirname -- "$0")")"
 
-make -s bin/golangci-lint
+make -s bin/gofumpt bin/handcrafted >/dev/null
 
-bin/golangci-lint run --disable-all --no-config -E goimports --fix ./...
+git ls-files -o -c --exclude-standard '*.go' |
+  bin/handcrafted |
+  xargs bin/gofumpt -w -extra

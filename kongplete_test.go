@@ -33,23 +33,21 @@ func TestComplete(t *testing.T) {
 			Embedded embed  `kong:"embed"`
 			Bar      string `kong:"predictor=things"`
 			Baz      bool
-			Qux      bool `kong:"hidden"`
-			Rabbit   struct {
-			} `kong:"cmd"`
-			Duck struct {
-			} `kong:"cmd"`
+			Qux      bool     `kong:"hidden"`
+			Rabbit   struct{} `kong:"cmd"`
+			Duck     struct{} `kong:"cmd"`
 		} `kong:"cmd"`
 		Bar struct {
 			Tiger   string `kong:"arg,predictor=things"`
 			Bear    string `kong:"arg,predictor=otherthings"`
-			OMG     string `kong:"enum='oh,my,gizzles'"`
-			Number  int    `kong:"short=n,enum='1,2,3'"`
+			OMG     string `kong:"required,enum='oh,my,gizzles'"`
+			Number  int    `kong:"required,short=n,enum='1,2,3'"`
 			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`
 	}
 
-	tests := []completeTest{
+	for _, td := range []completeTest{
 		{
 			parser: kong.Must(&cli),
 			want:   []string{"foo", "bar"},
@@ -72,7 +70,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"--bar", "--baz", "--lion", "--help"},
+			want:   []string{"--bar", "--baz", "--lion", "--help", "-h"},
 			line:   "myApp foo -",
 		},
 		{
@@ -87,7 +85,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"--bar", "--baz", "--lion", "--help"},
+			want:   []string{"--bar", "--baz", "--lion", "--help", "-h"},
 			line:   "myApp foo --baz -",
 		},
 		{
@@ -118,7 +116,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"-n", "--number", "--omg", "--help", "--boofl", "-b"},
+			want:   []string{"-n", "--number", "--omg", "--help", "-h", "--boofl", "-b"},
 			line:   "myApp bar -",
 		},
 		{
@@ -128,7 +126,7 @@ func TestComplete(t *testing.T) {
 		},
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"-n", "--number", "--omg", "--help", "--boofl", "-b"},
+			want:   []string{"-n", "--number", "--omg", "--help", "-h", "--boofl", "-b"},
 			line:   "myApp bar -b thing1 -",
 		},
 		{
@@ -141,8 +139,7 @@ func TestComplete(t *testing.T) {
 			want:   []string{"otherthing1", "otherthing2"},
 			line:   "myApp bar -b thing1 --omg gizzles ",
 		},
-	}
-	for _, td := range tests {
+	} {
 		name := td.name
 		if name == "" {
 			name = td.line
