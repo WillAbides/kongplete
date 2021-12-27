@@ -40,8 +40,8 @@ func TestComplete(t *testing.T) {
 		Bar struct {
 			Tiger   string `kong:"arg,predictor=things"`
 			Bear    string `kong:"arg,predictor=otherthings"`
-			OMG     string `kong:"enum='oh,my,gizzles'"`
-			Number  int    `kong:"short=n,enum='1,2,3'"`
+			OMG     string `kong:"required,enum='oh,my,gizzles'"`
+			Number  int    `kong:"required,short=n,enum='1,2,3'"`
 			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`

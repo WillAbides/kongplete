@@ -3,7 +3,7 @@ module github.com/willabides/kongplete
 go 1.17
 
 require (
-	github.com/alecthomas/kong v0.2.10
+	github.com/alecthomas/kong v0.2.22
 	github.com/posener/complete v1.2.3
 	github.com/stretchr/testify v1.7.0
 )
