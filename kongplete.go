@@ -5,7 +5,6 @@ import (
 
 	"github.com/alecthomas/kong"
 	"github.com/posener/complete"
-	"github.com/posener/complete/cmd/install"
 	"github.com/willabides/kongplete/internal/positionalpredictor"
 )
 
@@ -247,27 +246,4 @@ func positionalPredictors(args []*kong.Positional, predictors map[string]complet
 
 func flagPredictor(flag *kong.Flag, predictors map[string]complete.Predictor) (complete.Predictor, error) {
 	return valuePredictor(flag.Value, predictors)
-}
-
-// InstallShellCompletions is a helper to install completions for a kong context
-func InstallShellCompletions(k *kong.Context) error {
-	return install.Install(k.Model.Name)
-}
-
-// UninstallShellCompletions is a helper to uninstall completions for a kong context
-func UninstallShellCompletions(k *kong.Context) error {
-	return install.Uninstall(k.Model.Name)
-}
-
-// InstallCompletions is a kong command for installing or uninstalling shell completions
-type InstallCompletions struct {
-	Uninstall bool
-}
-
-// Run runs InstallCompletions
-func (c *InstallCompletions) Run(k *kong.Context) error {
-	if c.Uninstall {
-		return UninstallShellCompletions(k)
-	}
-	return InstallShellCompletions(k)
 }
