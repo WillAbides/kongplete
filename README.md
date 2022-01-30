@@ -3,7 +3,7 @@
 You kongplete me.
 
 kongplete lets you generate shell completions for your command-line programs using
-github.com/alecthomas/kong and github.com/posener/complete.
+[github.com/alecthomas/kong](https://github.com/alecthomas/kong) and [github.com/posener/complete](https://github.com/posener/complete).
 
 ## Examples
 
