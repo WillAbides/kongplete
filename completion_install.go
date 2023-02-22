@@ -13,12 +13,12 @@ import (
 
 // InstallCompletions is a kong command for installing or uninstalling shell completions
 type InstallCompletions struct {
-	Uninstall bool
+	Shell string `name:"shell" default:"auto" enum:"bash,zsh,fish,auto" help:"If set to 'auto', the completion is generated for your detected login shell, otherwise sets the shell to generate completions for.`
 }
 
-// BeforeApply installs completion into the users shell.
-func (c *InstallCompletions) BeforeApply(ctx *kong.Context) error {
-	err := installCompletionFromContext(ctx)
+// AfterApply installs completion into the users shell.
+func (c *InstallCompletions) AfterApply(ctx *kong.Context) error {
+	err := c.installCompletionFromContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -42,11 +42,16 @@ complete -f -c ${cmd} -a "(__complete_${cmd})"
 }
 
 // installCompletionFromContext writes shell completion for the given command.
-func installCompletionFromContext(ctx *kong.Context) error {
-	shell, err := loginshell.Shell()
-	if err != nil {
-		return errors.Wrapf(err, "couldn't determine user's shell")
+func (c *InstallCompletions) installCompletionFromContext(ctx *kong.Context) error {
+	shell := c.Shell
+	if (shell == "") || (shell == "auto") {
+		var err error
+		shell, err = loginshell.Shell()
+		if err != nil {
+			return errors.Wrapf(err, "couldn't determine user's shell")
+		}
 	}
+
 	bin, err := os.Executable()
 	if err != nil {
 		return errors.Wrapf(err, "couldn't find absolute path to ourselves")
