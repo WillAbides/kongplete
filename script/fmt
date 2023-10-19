@@ -1,11 +1,14 @@
 #!/bin/sh
+#/ script/fmt formats go code and shell scripts.
 
 set -e
 
-CDPATH="" cd -- "$(dirname -- "$(dirname -- "$0")")"
+CDPATH="" cd -- "$(dirname -- "$0")/.."
 
-make -s bin/gofumpt bin/handcrafted >/dev/null
+script/bindown -q install gofumpt shfmt handcrafted
 
 git ls-files -o -c --exclude-standard '*.go' |
   bin/handcrafted |
   xargs bin/gofumpt -w -extra
+
+bin/shfmt -ci -i 2 -ci -sr -w -s ./script

@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/alecthomas/kong"
-	"github.com/pkg/errors"
 	"github.com/riywo/loginshell"
 )
 
@@ -45,15 +44,15 @@ complete -f -c ${cmd} -a "(__complete_${cmd})"
 func installCompletionFromContext(ctx *kong.Context) error {
 	shell, err := loginshell.Shell()
 	if err != nil {
-		return errors.Wrapf(err, "couldn't determine user's shell")
+		return fmt.Errorf("couldn't determine user's shell: %w", err)
 	}
 	bin, err := os.Executable()
 	if err != nil {
-		return errors.Wrapf(err, "couldn't find absolute path to ourselves")
+		return fmt.Errorf("couldn't find absolute path to ourselves: %w", err)
 	}
 	bin, err = filepath.Abs(bin)
 	if err != nil {
-		return errors.Wrapf(err, "couldn't find absolute path to ourselves")
+		return fmt.Errorf("couldn't find absolute path to ourselves: %w", err)
 	}
 	w := ctx.Stdout
 	cmd := ctx.Model.Name
@@ -64,7 +63,7 @@ func installCompletionFromContext(ctx *kong.Context) error {
 func installCompletion(w io.Writer, shell, cmd, bin string) error {
 	script, ok := shellInstall[filepath.Base(shell)]
 	if !ok {
-		return errors.Errorf("unsupported shell %s", shell)
+		return fmt.Errorf("unsupported shell %s", shell)
 	}
 	vars := map[string]string{"cmd": cmd, "bin": bin}
 	fragment := os.Expand(script, func(s string) string {
