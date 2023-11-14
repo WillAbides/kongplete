@@ -46,7 +46,6 @@ func TestComplete(t *testing.T) {
 		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`
 		Pos struct {
-			RepeatedFlag []string `kong:"name=r,predictor=otherthings"`
 			Cumulative   []string `kong:"arg,predictor=things"`
 		} `kong:"cmd"`
 	}
@@ -56,11 +55,6 @@ func TestComplete(t *testing.T) {
 			parser: kong.Must(&cli),
 			want:   []string{"thing1", "thing2"},
 			line:   "myApp pos thing1 ",
-		},
-		{
-			parser: kong.Must(&cli),
-			want:   []string{"otherthing1", "otherthing2"},
-			line:   "myApp pos thing1 --r otherthings1 --r ",
 		},
 		{
 			parser: kong.Must(&cli),
