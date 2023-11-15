@@ -46,7 +46,7 @@ func TestComplete(t *testing.T) {
 		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`
 		Pos struct {
-			Cumulative   []string `kong:"arg,predictor=things"`
+			Cumulative []string `kong:"arg,predictor=things"`
 		} `kong:"cmd"`
 	}
 

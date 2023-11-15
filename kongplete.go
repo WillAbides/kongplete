@@ -151,9 +151,9 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 		return nil, err
 	}
 	cmd.Args = &positionalpredictor.PositionalPredictor{
-		Predictors: pps,
-		ArgFlags:   flagNamesWithHyphens(nonBoolFlags...),
-		BoolFlags:  flagNamesWithHyphens(boolFlags...),
+		Predictors:   pps,
+		ArgFlags:     flagNamesWithHyphens(nonBoolFlags...),
+		BoolFlags:    flagNamesWithHyphens(boolFlags...),
 		IsCumulative: isCumulative,
 	}
 
