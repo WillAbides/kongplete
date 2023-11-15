@@ -141,14 +141,20 @@ func nodeCommand(node *kong.Node, predictors map[string]complete.Predictor) (*co
 	}
 
 	boolFlags, nonBoolFlags := boolAndNonBoolFlags(node.Flags)
+	isCumulative := false
+	if len(node.Positional) > 0 && node.Positional[len(node.Positional)-1].IsCumulative() {
+		isCumulative = true
+	}
+
 	pps, err := positionalPredictors(node.Positional, predictors)
 	if err != nil {
 		return nil, err
 	}
 	cmd.Args = &positionalpredictor.PositionalPredictor{
-		Predictors: pps,
-		ArgFlags:   flagNamesWithHyphens(nonBoolFlags...),
-		BoolFlags:  flagNamesWithHyphens(boolFlags...),
+		Predictors:   pps,
+		ArgFlags:     flagNamesWithHyphens(nonBoolFlags...),
+		BoolFlags:    flagNamesWithHyphens(boolFlags...),
+		IsCumulative: isCumulative,
 	}
 
 	return &cmd, nil

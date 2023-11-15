@@ -45,12 +45,20 @@ func TestComplete(t *testing.T) {
 			BooFlag bool   `kong:"name=boofl,short=b"`
 		} `kong:"cmd"`
 		Baz struct{} `kong:"cmd,hidden"`
+		Pos struct {
+			Cumulative []string `kong:"arg,predictor=things"`
+		} `kong:"cmd"`
 	}
 
 	for _, td := range []completeTest{
 		{
 			parser: kong.Must(&cli),
-			want:   []string{"foo", "bar"},
+			want:   []string{"thing1", "thing2"},
+			line:   "myApp pos thing1 ",
+		},
+		{
+			parser: kong.Must(&cli),
+			want:   []string{"foo", "bar", "pos"},
 			line:   "myApp ",
 		},
 		{

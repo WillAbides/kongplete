@@ -55,6 +55,29 @@ func TestPositionalPredictor_predictor(t *testing.T) {
 	}
 }
 
+func TestPositionalPredictor_cumulativepredictor(t *testing.T) {
+	predictor1 := complete.PredictSet("1")
+	predictor2 := complete.PredictSet("2")
+	posPredictor := &PositionalPredictor{
+		Predictors:   []complete.Predictor{predictor1, predictor2},
+		IsCumulative: true,
+	}
+
+	for args, want := range map[string]complete.Predictor{
+		``:             predictor1,
+		`foo`:          predictor1,
+		`foo `:         predictor2,
+		`foo bar`:      predictor2,
+		`foo bar `:     predictor2,
+		`foo bar baz `: predictor2,
+	} {
+		t.Run(args, func(t *testing.T) {
+			got := posPredictor.predictor(newArgs("app " + args))
+			assert.Equal(t, want, got)
+		})
+	}
+}
+
 // The code below is taken from https://github.com/posener/complete/blob/f6dd29e97e24f8cb51a8d4050781ce2b238776a4/args.go
 // to assist in tests.
 
