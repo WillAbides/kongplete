@@ -12,12 +12,13 @@ import (
 
 // InstallCompletions is a kong command for installing or uninstalling shell completions
 type InstallCompletions struct {
+	Shell     string `arg:"" name:"shell" optional:"" help:"The shell to install completion for. If not provided, the user's login shell will be used."`
 	Uninstall bool
 }
 
 // BeforeApply installs completion into the users shell.
-func (c *InstallCompletions) BeforeApply(ctx *kong.Context) error {
-	err := installCompletionFromContext(ctx)
+func (c *InstallCompletions) AfterApply(ctx *kong.Context) error {
+	err := c.installCompletionFromContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -41,11 +42,20 @@ complete -f -c ${cmd} -a "(__complete_${cmd})"
 }
 
 // installCompletionFromContext writes shell completion for the given command.
-func installCompletionFromContext(ctx *kong.Context) error {
-	shell, err := loginshell.Shell()
-	if err != nil {
-		return fmt.Errorf("couldn't determine user's shell: %w", err)
+func (c *InstallCompletions) installCompletionFromContext(ctx *kong.Context) error {
+	var shell string
+	var err error
+
+	// If the user provided a shell, use that. Otherwise, use the user's login shell.
+	if c.Shell != "" {
+		shell = c.Shell
+	} else {
+		shell, err = loginshell.Shell()
+		if err != nil {
+			return fmt.Errorf("couldn't determine user's shell: %w", err)
+		}
 	}
+
 	bin, err := os.Executable()
 	if err != nil {
 		return fmt.Errorf("couldn't find absolute path to ourselves: %w", err)
